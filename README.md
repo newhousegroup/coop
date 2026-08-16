@@ -1,6 +1,6 @@
 # Newhouse CoOp
 
-**Version 0.1.2**
+**Version 0.1.3**
 
 A small browser-based multiplayer meeting-room experiment by Newhouse.
 
@@ -11,30 +11,37 @@ A small browser-based multiplayer meeting-room experiment by Newhouse.
 - Up to 6 people in a room.
 - Move around a shared 2D map with WASD / arrow keys on desktop or a joystick on touch devices.
 - Send room-wide text chat messages.
-- No Newhouse backend or database.
+- Uses WebRTC DataChannels for room traffic.
 
 ## Networking
 
-CoOp uses [PeerJS](https://peerjs.com/) for WebRTC DataChannels and PeerJS Cloud for signaling.
+CoOp uses PeerJS Cloud for WebRTC signaling. Actual room traffic uses WebRTC DataChannels.
 
-The first user is the room host. Up to five guests connect to the host. The host relays player position updates and chat packets to the other guests. This keeps the prototype simple and avoids a full peer-to-peer mesh while still keeping actual room data on WebRTC connections.
+Version 0.1.3 adds Cloudflare TURN as a required fallback for restrictive NATs and firewalls. CoOp requests short-lived TURN credentials from a Netlify Function before creating or joining a room. Direct peer-to-peer connectivity is still preferred; TURN is used automatically when a direct route is unavailable.
 
-The four-color code maps deterministically to the host's PeerJS ID. If that ID is already occupied, CoOp automatically generates another color code.
+The room UI reports the selected route as `Connected · direct` or `Connected · TURN relay` when the browser exposes enough ICE statistics to identify it.
 
-### 0.1.2 networking fix
+CoOp intentionally fails closed if TURN credentials cannot be obtained. A meeting room will not be created while relay capability is unavailable.
 
-Version 0.1.2 changes room discovery to mirror the stable lifecycle used by Mirage Transfer:
+## Netlify configuration
 
-- PeerJS Cloud settings are explicit.
-- A failed guest lookup destroys the guest PeerJS instance completely.
-- Every retry creates a fresh PeerJS peer before reconnecting to the same four-color room ID.
-- The host still attempts to re-register after a signaling disconnect.
-- Static scripts are versioned in `index.html` so browsers do not keep stale networking code after an update.
+Create a Cloudflare TURN key, then add these environment variables to the Netlify site with Functions scope:
 
-Because the host coordinates the room, the room ends if the host leaves.
+- `TURNTOKEN` — the secret token belonging to the Cloudflare TURN key.
+- `TURNKEYID` — the Cloudflare TURN key ID / UID.
+
+Do not put either value in browser JavaScript or commit the token to this repository.
+
+After changing environment variables, trigger a new Netlify deploy so the Function receives the new values.
+
+The server-side credential broker is `netlify/functions/turn-credentials.mjs` and is exposed at `/api/turn-credentials`. It requests 24-hour short-lived ICE credentials from Cloudflare and removes the browser-unfriendly alternate port 53 entries while retaining TURN over UDP, TCP, and TLS/443.
+
+## Room model
+
+The first user is the room host. Up to five guests connect to the host. The host relays player position and chat packets between connected guests. Because the host coordinates the room, the room ends if the host leaves.
+
+The four-color room code maps deterministically to the host's PeerJS brokering ID. If that ID is already occupied, CoOp generates another code.
 
 ## Run
 
-This is a static site. Serve the repository through GitHub Pages, Netlify, or any ordinary HTTPS static host.
-
-Opening `index.html` directly may work in some browsers, but HTTPS hosting is recommended for consistent WebRTC behavior.
+Deploy the repository on Netlify so the TURN credential Function is available. Plain static hosting without the Netlify Function will deliberately prevent rooms from starting in 0.1.3.
