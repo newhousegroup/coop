@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=0.1.4">
+  <link rel="stylesheet" href="styles.css?v=0.2.0">
+  <link rel="stylesheet" href="header.css?v=0.2.0">
 </head>
 <body>
   <main id="app">
@@ -44,17 +45,15 @@
         </div>
 
         <p id="lobbyStatus" class="status-text" role="status" aria-live="polite"></p>
-        <p class="version-mark">0.1.4</p>
+        <p class="version-mark">0.2.0</p>
       </div>
     </section>
 
     <section id="room" class="room hidden" aria-hidden="true">
       <header class="topbar">
         <div class="topbar-brand">
-          <div>
-            <strong>Newhouse CoOp</strong>
-            <span id="connectionStatus">Connected</span>
-          </div>
+          <strong>Newhouse CoOp</strong>
+          <span id="connectionStatus" class="connection-dot" data-state="ready" role="status" aria-live="polite" aria-label="Ready" title="Ready">Ready</span>
         </div>
 
         <div class="room-meta">
@@ -133,9 +132,10 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
-  <script src="version.js?v=0.1.4"></script>
-  <script src="app.js?v=0.1.4"></script>
-  <script src="network.js?v=0.1.4"></script>
-  <script src="sync.js?v=0.1.4"></script>
+  <script src="version.js?v=0.2.0"></script>
+  <script src="app.js?v=0.2.0"></script>
+  <script src="network.js?v=0.2.0"></script>
+  <script src="sync.js?v=0.2.0"></script>
+  <script src="status.js?v=0.2.0"></script>
 </body>
 </html>
