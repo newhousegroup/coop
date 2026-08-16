@@ -41,11 +41,6 @@
       if (!instance.destroyed) scheduleReconnect();
     });
 
-    // Wrap later error handlers registered by app.js. An unavailable-id before
-    // the first successful open means a newly generated room code collided and
-    // app.js should regenerate it. The same error after a successful open can
-    // happen during re-registration; do not let app.js silently generate an
-    // entirely different room while people are already inside.
     instance.on = (event, handler) => {
       if (event !== "error") return nativeOn(event, handler);
 
@@ -140,7 +135,7 @@
 
       const conn = peer.connect(targetId, {
         reliable: true,
-        metadata: { app: "newhouse-coop", version: APP_VERSION }
+        metadata: { app: "newhouse-coop", version: window.COOP_VERSION || "0.1.1" }
       });
 
       hostConnection = conn;
