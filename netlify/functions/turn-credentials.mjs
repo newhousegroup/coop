@@ -1,4 +1,4 @@
-const TTL_SECONDS = 6 * 60 * 60;
+const TTL_SECONDS = 24 * 60 * 60;
 
 function json(body, status = 200) {
   return Response.json(body, {
