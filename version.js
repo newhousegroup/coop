@@ -1,1 +1,1 @@
-window.COOP_VERSION = "0.1.4";
+window.COOP_VERSION = "0.2.0";
