@@ -1,6 +1,6 @@
 # Newhouse CoOp
 
-**Version 0.1.0**
+**Version 0.1.1**
 
 A small browser-based multiplayer meeting-room experiment by Newhouse.
 
@@ -20,6 +20,8 @@ CoOp uses [PeerJS](https://peerjs.com/) for WebRTC DataChannels and PeerJS Cloud
 The first user is the room host. Up to five guests connect to the host. The host relays player position updates and chat packets to the other guests. This keeps the prototype simple and avoids a full peer-to-peer mesh while still keeping actual room data on WebRTC connections.
 
 The four-color code maps deterministically to the host's PeerJS ID. If that ID is already occupied, CoOp automatically generates another color code.
+
+Version 0.1.1 adds signaling resilience: hosts attempt to re-register with PeerJS after a signaling disconnect, and guests retry transient room lookup failures before declaring a room unavailable.
 
 Because the host coordinates the room, the room ends if the host leaves.
 
