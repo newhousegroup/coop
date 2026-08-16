@@ -1,6 +1,6 @@
 # Newhouse CoOp
 
-**Version 0.2.0**
+**Version 0.2.1**
 
 A small browser-based multiplayer meeting-room experiment by Newhouse.
 
@@ -13,16 +13,18 @@ A small browser-based multiplayer meeting-room experiment by Newhouse.
 - Send room-wide text chat messages.
 - Uses WebRTC DataChannels for room traffic.
 
-## 0.2.0 room header
+## 0.2.x interface
 
-The in-room header is simplified to a centered `Newhouse CoOp` title with a compact connection indicator:
+Version 0.2.0 introduced the compact connection indicator:
 
 - Green — direct WebRTC connection.
 - Blue — TURN-relayed WebRTC connection.
 - Yellow — ready, hosting, connecting, or reconnecting.
 - Red — connection failure or interruption.
 
-The indicator keeps the detailed connection state as an accessible label / tooltip while removing the visible status text from the header.
+Version 0.2.1 corrects the header placement: the dark login screen now uses a single centered `Newhouse CoOp` title, while the in-room header is left-aligned again with the connection dot beside the title.
+
+The indicator keeps the detailed connection state as an accessible label / tooltip while removing the visible status sentence from the room header.
 
 ## Networking
 
