@@ -1,6 +1,6 @@
 # Newhouse CoOp
 
-**Version 0.1.3**
+**Version 0.1.4**
 
 A small browser-based multiplayer meeting-room experiment by Newhouse.
 
@@ -17,7 +17,9 @@ A small browser-based multiplayer meeting-room experiment by Newhouse.
 
 CoOp uses PeerJS Cloud for WebRTC signaling. Actual room traffic uses WebRTC DataChannels.
 
-Version 0.1.3 adds Cloudflare TURN as a required fallback for restrictive NATs and firewalls. CoOp requests short-lived TURN credentials from a Netlify Function before creating or joining a room. Direct peer-to-peer connectivity is still preferred; TURN is used automatically when a direct route is unavailable.
+Version 0.1.3 added Cloudflare TURN as a required fallback for restrictive NATs and firewalls. CoOp requests short-lived TURN credentials from a Netlify Function before creating or joining a room. Direct peer-to-peer connectivity is still preferred; TURN is used automatically when a direct route is unavailable.
+
+Version 0.1.4 fixes host-to-guest synchronization. The 0.1.3 guest join handler stopped processing inbound packets after receiving the initial welcome packet, which meant guest interactions reached the host but later host movement and messages did not reach the guest UI. `sync.js` installs a steady-state receive listener after the room is established and also restores guest-side host-close detection.
 
 The room UI reports the selected route as `Connected · direct` or `Connected · TURN relay` when the browser exposes enough ICE statistics to identify it.
 
@@ -44,4 +46,4 @@ The four-color room code maps deterministically to the host's PeerJS brokering I
 
 ## Run
 
-Deploy the repository on Netlify so the TURN credential Function is available. Plain static hosting without the Netlify Function will deliberately prevent rooms from starting in 0.1.3.
+Deploy the repository on Netlify so the TURN credential Function is available. Plain static hosting without the Netlify Function deliberately prevents rooms from starting.
