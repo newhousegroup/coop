@@ -3,21 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f4f1ea">
+  <meta name="theme-color" content="#0e0f11">
   <title>Newhouse CoOp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main id="app">
     <section id="lobby" class="lobby" aria-labelledby="brand-title">
       <div class="lobby-card">
-        <div class="brand-mark" aria-hidden="true">N</div>
         <p class="eyebrow">Newhouse</p>
         <h1 id="brand-title">CoOp</h1>
-        <p class="lede">A tiny shared room for moving around and talking together.</p>
+        <p class="lede">Move around, meet up, and chat.</p>
 
-        <label class="field-label" for="displayName">Your name</label>
-        <input id="displayName" class="text-input" maxlength="20" autocomplete="nickname" placeholder="Enter a name">
+        <label class="field-label" for="displayName">Name</label>
+        <input id="displayName" class="text-input" maxlength="20" autocomplete="nickname" placeholder="Your name">
 
         <div id="lobbyHome" class="lobby-panel">
           <button id="createRoomBtn" class="primary-btn" type="button">Create room</button>
@@ -42,13 +44,13 @@
         </div>
 
         <p id="lobbyStatus" class="status-text" role="status" aria-live="polite"></p>
+        <p class="version-mark">0.1.0</p>
       </div>
     </section>
 
     <section id="room" class="room hidden" aria-hidden="true">
       <header class="topbar">
         <div class="topbar-brand">
-          <div class="brand-mark small" aria-hidden="true">N</div>
           <div>
             <strong>Newhouse CoOp</strong>
             <span id="connectionStatus">Connected</span>
@@ -102,7 +104,11 @@
 
             <div id="playersLayer" class="players-layer" aria-live="polite"></div>
 
-            <div class="map-hint">Tap anywhere to move · WASD / arrow keys on keyboard</div>
+            <div class="map-hint">WASD / arrow keys to move</div>
+
+            <div id="joystick" class="joystick" aria-label="Movement joystick">
+              <div id="joystickKnob" class="joystick-knob"></div>
+            </div>
           </div>
         </section>
 
