@@ -1,6 +1,6 @@
 # Newhouse CoOp
 
-**Version 0.1.4**
+**Version 0.2.0**
 
 A small browser-based multiplayer meeting-room experiment by Newhouse.
 
@@ -13,15 +13,24 @@ A small browser-based multiplayer meeting-room experiment by Newhouse.
 - Send room-wide text chat messages.
 - Uses WebRTC DataChannels for room traffic.
 
+## 0.2.0 room header
+
+The in-room header is simplified to a centered `Newhouse CoOp` title with a compact connection indicator:
+
+- Green — direct WebRTC connection.
+- Blue — TURN-relayed WebRTC connection.
+- Yellow — ready, hosting, connecting, or reconnecting.
+- Red — connection failure or interruption.
+
+The indicator keeps the detailed connection state as an accessible label / tooltip while removing the visible status text from the header.
+
 ## Networking
 
 CoOp uses PeerJS Cloud for WebRTC signaling. Actual room traffic uses WebRTC DataChannels.
 
 Version 0.1.3 added Cloudflare TURN as a required fallback for restrictive NATs and firewalls. CoOp requests short-lived TURN credentials from a Netlify Function before creating or joining a room. Direct peer-to-peer connectivity is still preferred; TURN is used automatically when a direct route is unavailable.
 
-Version 0.1.4 fixes host-to-guest synchronization. The 0.1.3 guest join handler stopped processing inbound packets after receiving the initial welcome packet, which meant guest interactions reached the host but later host movement and messages did not reach the guest UI. `sync.js` installs a steady-state receive listener after the room is established and also restores guest-side host-close detection.
-
-The room UI reports the selected route as `Connected · direct` or `Connected · TURN relay` when the browser exposes enough ICE statistics to identify it.
+Version 0.1.4 fixed host-to-guest synchronization by keeping a steady-state receive listener alive after the initial welcome handshake.
 
 CoOp intentionally fails closed if TURN credentials cannot be obtained. A meeting room will not be created while relay capability is unavailable.
 
