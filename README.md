@@ -1,5 +1,7 @@
 # Newhouse CoOp
 
+**Version 0.1.0**
+
 A small browser-based multiplayer meeting-room experiment by Newhouse.
 
 ## What it does
@@ -7,7 +9,7 @@ A small browser-based multiplayer meeting-room experiment by Newhouse.
 - Create or join a room using a four-block color code.
 - Six possible colors: Coral, Peach, Yellow, Turquoise, Blue, and Purple.
 - Up to 6 people in a room.
-- Move around a shared 2D map by clicking/tapping or using WASD / arrow keys.
+- Move around a shared 2D map with WASD / arrow keys on desktop or a joystick on touch devices.
 - Send room-wide text chat messages.
 - No Newhouse backend or database.
 
