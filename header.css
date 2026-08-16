@@ -1,14 +1,24 @@
+.lobby-title {
+  margin: 0 0 38px;
+  text-align: center;
+  color: #f3f3ef;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
 .topbar {
   position: relative;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .topbar-brand {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: block;
+  position: static;
+  transform: none;
+  display: flex;
+  align-items: center;
+  gap: 9px;
   min-width: 0;
   pointer-events: none;
 }
@@ -16,21 +26,21 @@
 .topbar-brand strong {
   display: block;
   margin: 0;
-  font-size: 16px;
-  font-weight: 720;
+  font-size: 14px;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
 .topbar-brand .connection-dot {
-  position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
+  position: static;
+  display: block;
   width: 9px;
   height: 9px;
   margin: 0;
-  transform: translateY(-50%);
+  transform: none;
+  flex: 0 0 auto;
   border-radius: 50%;
   background: #d8ad36;
   box-shadow: 0 0 0 1px rgba(37, 36, 31, 0.08);
@@ -60,25 +70,27 @@
 }
 
 @media (max-width: 760px) {
+  .lobby-title {
+    margin-bottom: 34px;
+    font-size: 26px;
+  }
+
   .topbar {
-    min-height: 104px;
-    align-items: center;
-    flex-wrap: nowrap;
-    gap: 0;
-    padding: 48px 12px 10px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    padding: 10px 12px;
   }
 
   .topbar-brand {
-    top: 19px;
-    transform: translateX(-50%);
+    gap: 8px;
   }
 
   .topbar-brand strong {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .topbar-brand .connection-dot {
-    left: calc(100% + 9px);
     width: 8px;
     height: 8px;
   }
