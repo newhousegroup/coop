@@ -1,5 +1,6 @@
 const MAX_USERS = 6;
 const ROOM_PREFIX = "newhouse-coop-room-";
+const APP_VERSION = "0.1.0";
 
 const COLORS = [
   { name: "Coral", key: "0", hex: "#ef7468" },
@@ -31,6 +32,9 @@ const playersLayer = document.querySelector("#playersLayer");
 const messages = document.querySelector("#messages");
 const chatInput = document.querySelector("#chatInput");
 const sendBtn = document.querySelector("#sendBtn");
+const joystick = document.querySelector("#joystick");
+const joystickKnob = document.querySelector("#joystickKnob");
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
 let peer = null;
 let hostConnection = null;
@@ -45,6 +49,14 @@ let chatHistory = [];
 let connectionAttempt = 0;
 let roomReady = false;
 let lastMoveSent = 0;
+
+const joystickState = {
+  pointerId: null,
+  x: 0,
+  y: 0,
+  animationFrame: null,
+  lastFrameTime: 0
+};
 
 function randomCode() {
   return Array.from({ length: 4 }, () => COLORS[Math.floor(Math.random() * COLORS.length)].key);
@@ -61,6 +73,10 @@ function colorFromKey(key) {
 function setLobbyStatus(text = "", isError = false) {
   lobbyStatus.textContent = text;
   lobbyStatus.classList.toggle("error", isError);
+}
+
+function setThemeColor(color) {
+  if (themeColorMeta) themeColorMeta.setAttribute("content", color);
 }
 
 function safeName() {
@@ -112,8 +128,11 @@ function removeJoinSlot(index) {
 
 function renderRoomCode() {
   roomCode.replaceChildren();
+
   currentRoomCode.forEach((key) => {
     const color = colorFromKey(key);
+    if (!color) return;
+
     const chip = document.createElement("span");
     chip.className = "code-chip";
     chip.style.background = color.hex;
@@ -127,6 +146,7 @@ function enterRoom() {
   lobby.setAttribute("aria-hidden", "true");
   room.classList.remove("hidden");
   room.setAttribute("aria-hidden", "false");
+  setThemeColor("#f4f1ea");
   renderRoomCode();
   renderPlayers();
   renderMessages();
@@ -136,6 +156,7 @@ function enterRoom() {
 
 function returnToLobby(message = "") {
   cleanupPeer();
+  resetJoystick();
 
   roomReady = false;
   isHost = false;
@@ -155,6 +176,7 @@ function returnToLobby(message = "") {
   joinPanel.setAttribute("aria-hidden", "true");
   joinCode = [];
   renderJoinCode();
+  setThemeColor("#0e0f11");
   setLobbyStatus(message);
 }
 
@@ -245,7 +267,7 @@ function joinRoom() {
     const targetId = codeToPeerId(currentRoomCode);
     const conn = peer.connect(targetId, {
       reliable: true,
-      metadata: { app: "newhouse-coop" }
+      metadata: { app: "newhouse-coop", version: APP_VERSION }
     });
     hostConnection = conn;
 
@@ -376,6 +398,7 @@ function handleGuestData(data) {
 
   if (data.type === "welcome") {
     players.clear();
+
     for (const player of Array.isArray(data.players) ? data.players : []) {
       if (validPlayer(player)) players.set(player.id, player);
     }
@@ -426,7 +449,6 @@ function handleGuestData(data) {
     chatHistory.push(data.message);
     chatHistory = chatHistory.slice(-100);
     renderMessages();
-    return;
   }
 }
 
@@ -463,9 +485,11 @@ function validPlayer(player) {
 
 function firstAvailableColorIndex() {
   const used = new Set([...players.values()].map((player) => player.colorIndex));
+
   for (let i = 0; i < COLORS.length; i += 1) {
     if (!used.has(i)) return i;
   }
+
   return players.size % COLORS.length;
 }
 
@@ -478,6 +502,7 @@ function spawnPoint(index) {
     { x: 53, y: 81 },
     { x: 50, y: 63 }
   ];
+
   return points[index % points.length];
 }
 
@@ -548,6 +573,7 @@ function sendChat() {
 
   const text = cleanMessage(chatInput.value);
   if (!text) return;
+
   chatInput.value = "";
   resizeChatInput();
 
@@ -666,6 +692,7 @@ function friendlyPeerError(error) {
     "socket-error": "the signaling connection failed",
     "socket-closed": "the signaling connection closed"
   };
+
   return messagesByType[type] || "a WebRTC connection error occurred";
 }
 
@@ -674,8 +701,69 @@ function resizeChatInput() {
   chatInput.style.height = `${Math.min(chatInput.scrollHeight, 110)}px`;
 }
 
+function updateJoystickFromPointer(event) {
+  const rect = joystick.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const rawX = event.clientX - centerX;
+  const rawY = event.clientY - centerY;
+  const distance = Math.hypot(rawX, rawY);
+  const maxDistance = Math.max(1, rect.width / 2 - 27);
+  const scale = distance > maxDistance ? maxDistance / distance : 1;
+  const knobX = rawX * scale;
+  const knobY = rawY * scale;
+
+  joystickState.x = Math.max(-1, Math.min(1, rawX / maxDistance));
+  joystickState.y = Math.max(-1, Math.min(1, rawY / maxDistance));
+
+  if (distance > maxDistance) {
+    joystickState.x = knobX / maxDistance;
+    joystickState.y = knobY / maxDistance;
+  }
+
+  joystickKnob.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`;
+}
+
+function startJoystickLoop() {
+  if (joystickState.animationFrame !== null) return;
+  joystickState.lastFrameTime = performance.now();
+
+  const tick = (time) => {
+    const dt = Math.min(32, Math.max(0, time - joystickState.lastFrameTime));
+    joystickState.lastFrameTime = time;
+
+    if (joystickState.pointerId !== null && roomReady && players.has(localId)) {
+      const player = players.get(localId);
+      const speed = 0.032;
+      moveLocalTo(
+        player.x + joystickState.x * speed * dt,
+        player.y + joystickState.y * speed * dt
+      );
+      joystickState.animationFrame = requestAnimationFrame(tick);
+      return;
+    }
+
+    joystickState.animationFrame = null;
+  };
+
+  joystickState.animationFrame = requestAnimationFrame(tick);
+}
+
+function resetJoystick() {
+  joystickState.pointerId = null;
+  joystickState.x = 0;
+  joystickState.y = 0;
+  joystickKnob.style.transform = "translate(-50%, -50%)";
+
+  if (joystickState.animationFrame !== null) {
+    cancelAnimationFrame(joystickState.animationFrame);
+    joystickState.animationFrame = null;
+  }
+}
+
 renderPalette();
 renderJoinCode();
+setThemeColor("#0e0f11");
 
 joinSlots.forEach((slot, index) => {
   slot.addEventListener("click", () => removeJoinSlot(index));
@@ -712,12 +800,40 @@ chatInput.addEventListener("keydown", (event) => {
 });
 
 map.addEventListener("pointerdown", (event) => {
+  if (event.pointerType === "touch" || window.matchMedia("(pointer: coarse)").matches) return;
   if (event.target.closest(".player")) return;
+
   const rect = map.getBoundingClientRect();
   const x = ((event.clientX - rect.left) / rect.width) * 100;
   const y = ((event.clientY - rect.top) / rect.height) * 100;
   moveLocalTo(x, y);
 });
+
+joystick.addEventListener("pointerdown", (event) => {
+  if (!roomReady || joystickState.pointerId !== null) return;
+
+  event.preventDefault();
+  joystickState.pointerId = event.pointerId;
+  joystick.setPointerCapture?.(event.pointerId);
+  updateJoystickFromPointer(event);
+  startJoystickLoop();
+});
+
+joystick.addEventListener("pointermove", (event) => {
+  if (event.pointerId !== joystickState.pointerId) return;
+  event.preventDefault();
+  updateJoystickFromPointer(event);
+});
+
+function endJoystickPointer(event) {
+  if (event.pointerId !== joystickState.pointerId) return;
+  event.preventDefault();
+  resetJoystick();
+}
+
+joystick.addEventListener("pointerup", endJoystickPointer);
+joystick.addEventListener("pointercancel", endJoystickPointer);
+joystick.addEventListener("lostpointercapture", () => resetJoystick());
 
 window.addEventListener("keydown", (event) => {
   if (!roomReady || document.activeElement === chatInput || document.activeElement === displayName) return;
@@ -741,4 +857,7 @@ window.addEventListener("keydown", (event) => {
   moveLocalTo(player.x + movement[0], player.y + movement[1]);
 });
 
-window.addEventListener("beforeunload", cleanupPeer);
+window.addEventListener("beforeunload", () => {
+  resetJoystick();
+  cleanupPeer();
+});
