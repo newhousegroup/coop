@@ -1,6 +1,6 @@
 # Newhouse CoOp
 
-**Version 0.1.1**
+**Version 0.1.2**
 
 A small browser-based multiplayer meeting-room experiment by Newhouse.
 
@@ -21,7 +21,15 @@ The first user is the room host. Up to five guests connect to the host. The host
 
 The four-color code maps deterministically to the host's PeerJS ID. If that ID is already occupied, CoOp automatically generates another color code.
 
-Version 0.1.1 adds signaling resilience: hosts attempt to re-register with PeerJS after a signaling disconnect, and guests retry transient room lookup failures before declaring a room unavailable.
+### 0.1.2 networking fix
+
+Version 0.1.2 changes room discovery to mirror the stable lifecycle used by Mirage Transfer:
+
+- PeerJS Cloud settings are explicit.
+- A failed guest lookup destroys the guest PeerJS instance completely.
+- Every retry creates a fresh PeerJS peer before reconnecting to the same four-color room ID.
+- The host still attempts to re-register after a signaling disconnect.
+- Static scripts are versioned in `index.html` so browsers do not keep stale networking code after an update.
 
 Because the host coordinates the room, the room ends if the host leaves.
 
