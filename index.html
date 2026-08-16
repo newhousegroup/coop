@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f1ea">
+  <title>Newhouse CoOp</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app">
+    <section id="lobby" class="lobby" aria-labelledby="brand-title">
+      <div class="lobby-card">
+        <div class="brand-mark" aria-hidden="true">N</div>
+        <p class="eyebrow">Newhouse</p>
+        <h1 id="brand-title">CoOp</h1>
+        <p class="lede">A tiny shared room for moving around and talking together.</p>
+
+        <label class="field-label" for="displayName">Your name</label>
+        <input id="displayName" class="text-input" maxlength="20" autocomplete="nickname" placeholder="Enter a name">
+
+        <div id="lobbyHome" class="lobby-panel">
+          <button id="createRoomBtn" class="primary-btn" type="button">Create room</button>
+          <button id="showJoinBtn" class="secondary-btn" type="button">Join room</button>
+        </div>
+
+        <div id="joinPanel" class="lobby-panel hidden" aria-hidden="true">
+          <div class="panel-heading-row">
+            <button id="backBtn" class="text-btn" type="button">Back</button>
+            <span>Enter the four colors</span>
+          </div>
+
+          <div id="joinSlots" class="code-blocks join-code" aria-label="Room code">
+            <button class="code-slot empty" data-slot="0" type="button" aria-label="First color"></button>
+            <button class="code-slot empty" data-slot="1" type="button" aria-label="Second color"></button>
+            <button class="code-slot empty" data-slot="2" type="button" aria-label="Third color"></button>
+            <button class="code-slot empty" data-slot="3" type="button" aria-label="Fourth color"></button>
+          </div>
+
+          <div id="colorPalette" class="color-palette" aria-label="Choose a color"></div>
+          <button id="joinRoomBtn" class="primary-btn" type="button" disabled>Join room</button>
+        </div>
+
+        <p id="lobbyStatus" class="status-text" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="room" class="room hidden" aria-hidden="true">
+      <header class="topbar">
+        <div class="topbar-brand">
+          <div class="brand-mark small" aria-hidden="true">N</div>
+          <div>
+            <strong>Newhouse CoOp</strong>
+            <span id="connectionStatus">Connected</span>
+          </div>
+        </div>
+
+        <div class="room-meta">
+          <div class="room-code-wrap">
+            <span class="meta-label">Room</span>
+            <div id="roomCode" class="code-blocks compact" aria-label="Current room code"></div>
+          </div>
+          <div class="people-count" title="People in room">
+            <span class="people-icon" aria-hidden="true">●</span>
+            <span id="peopleCount">1 / 6</span>
+          </div>
+          <button id="leaveBtn" class="leave-btn" type="button">Leave</button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <section class="map-column" aria-label="Shared map">
+          <div id="map" class="map" tabindex="0">
+            <div class="map-grid" aria-hidden="true"></div>
+
+            <div class="map-zone quiet-zone" aria-hidden="true">
+              <span>Quiet corner</span>
+              <div class="sofa sofa-a"></div>
+              <div class="sofa sofa-b"></div>
+              <div class="plant plant-a">✦</div>
+            </div>
+
+            <div class="map-zone table-zone" aria-hidden="true">
+              <span>CoOp table</span>
+              <div class="table-shape"></div>
+              <i class="chair c1"></i><i class="chair c2"></i><i class="chair c3"></i>
+              <i class="chair c4"></i><i class="chair c5"></i><i class="chair c6"></i>
+            </div>
+
+            <div class="map-zone studio-zone" aria-hidden="true">
+              <span>Studio</span>
+              <div class="board-shape"></div>
+              <div class="desk-shape"></div>
+              <div class="plant plant-b">✦</div>
+            </div>
+
+            <div class="map-zone lounge-zone" aria-hidden="true">
+              <span>Lounge</span>
+              <div class="rug-shape"></div>
+              <div class="coffee-table"></div>
+            </div>
+
+            <div id="playersLayer" class="players-layer" aria-live="polite"></div>
+
+            <div class="map-hint">Tap anywhere to move · WASD / arrow keys on keyboard</div>
+          </div>
+        </section>
+
+        <aside class="chat-panel" aria-label="Room chat">
+          <div class="chat-header">
+            <div>
+              <h2>Room chat</h2>
+              <p>Messages stay in this room.</p>
+            </div>
+          </div>
+
+          <div id="messages" class="messages" aria-live="polite"></div>
+
+          <div class="chat-compose">
+            <label class="sr-only" for="chatInput">Message</label>
+            <textarea id="chatInput" rows="1" maxlength="500" placeholder="Message everyone"></textarea>
+            <button id="sendBtn" class="send-btn" type="button" aria-label="Send message">↑</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
